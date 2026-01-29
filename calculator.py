@@ -39,10 +39,6 @@ class SmartCalculator:
         return amount
 
     def loan_emi(self, principal, rate, time_years):
-        """
-        Calculates monthly EMI for a loan.
-        EMI = [P x r x (1+r)^n]/[(1+r)^n-1]
-        """
         r = (rate / 100) / 12
         n = time_years * 12
         if r == 0:

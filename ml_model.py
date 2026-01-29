@@ -40,5 +40,6 @@ class ExpensePredictor:
         if not self.is_trained:
             return 0.0
             
-        prediction = self.model.predict([[month]])
-        return max(0, prediction[0])
+        X_predict = pd.DataFrame([[month]], columns=['month'])
+        prediction = self.model.predict(X_predict)
+        return max(0, float(prediction[0]))
