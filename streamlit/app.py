@@ -11,8 +11,8 @@ from calculator import SmartCalculator
 def load_calculator():
     """Loads the SmartCalculator and trains the model."""
     try:
-        calc = SmartCalculator()
-        # Ensure we have the latest methods, otherwise clear cache and retry
+        calc = SmartCalculator(),
+
         if not hasattr(calc, 'compound_interest') or not hasattr(calc, 'loan_emi'):
             st.cache_resource.clear()
             calc = SmartCalculator()
@@ -157,7 +157,7 @@ def main():
                 expense_data = expense_data.sort_values('month')
                 expense_data.to_csv(data_path, index=False)
                 calc.expense_predictor.train_model()
-                st.cache_resource.clear() # Clear cache to ensure fresh object on reload
+                st.cache_resource.clear() 
                 st.rerun()
 
 if __name__ == "__main__":
