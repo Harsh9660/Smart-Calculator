@@ -1,17 +1,26 @@
-# Smart-Calculator
+# Smart Calculator with Machine Learning
 
-A simple, web-based calculator built with Python and Streamlit. This application provides a user-friendly interface to perform basic arithmetic operations.
+## Project Overview
+A Python application that combines a basic calculator with machine learning to predict future expenses. It performs arithmetic operations and uses Linear Regression to forecast expenses based on historical data.
 
 ## Features
+- Basic arithmetic: add, subtract, multiply, divide
+- Calculate total expense over months
+- Predict future expense using a trained ML model
 
-*   Addition
-*   Subtraction
-*   Multiplication
-*   Division
-*   Modulo
-*   Power
+## Technologies
+- Python
+- Pandas
+- Scikit-learn (Linear Regression)
 
-## How to Run
+## How to Use
+1. Run `calculator.py`
+2. Choose between basic calculator, expense calculation, or prediction
+3. Follow prompts to enter inputs
 
-1.  Install the required dependencies: `pip install streamlit`
-2.  From the project's root directory, run the command: `streamlit run streamlit/app.py`
+## Data
+Historical expense data is stored in `data.csv` and used to train the ML model.
+
+---
+
+Feel free to expand this project by adding savings and loan prediction features, a GUI, or more complex ML models!

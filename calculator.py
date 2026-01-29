@@ -1,23 +1,100 @@
-def add(a,b):
-   """This function adds two numbers"""
-   return a+b
+from ml_model import ExpensePredictor
 
-def sub(a,b):
-   """This function subtracts two numbers"""
-   return a-b
+class SmartCalculator:
+    def __init__(self):
+        self.expense_predictor = ExpensePredictor()
+        self.expense_predictor.train_model()
 
-def mul(a,b):
-   """This function multiplies two numbers"""
-   return a*b
+    def add(self, a, b):
+        return a + b
 
-def div(a,b):
-   """This function divides two numbers"""
-   return a/b
+    def subtract(self, a, b):
+        return a - b
 
-def mod(a,b):
-   """This function returns the remainder of two numbers"""
-   return a%b
+    def multiply(self, a, b):
+        return a * b
 
-def pow(a,b):
-    """This function returns the power of a number"""
-    return a**b
+    def divide(self, a, b):
+        if b == 0:
+            raise ValueError("Cannot divide by zero")
+        return a / b
+
+    def modulo(self, a, b):
+        if b == 0:
+            raise ValueError("Cannot perform modulo by zero")
+        return a % b
+
+    def power(self, a, b):
+        return a ** b
+
+    def calculate_expense(self, monthly, months):
+        return monthly * months
+
+    def predict_expense(self, future_month):
+        return self.expense_predictor.predict(future_month)
+
+def main():
+    calc = SmartCalculator()
+
+    while True:
+        print("\n--- Smart Calculator Menu ---")
+        print("1. Basic Calculator")
+        print("2. Calculate Total Expense")
+        print("3. Predict Future Expense (ML)")
+        print("4. Exit")
+
+        choice = input("Choose an option: ")
+
+        if choice == "1":
+            try:
+                a = float(input("Enter first number: "))
+                b = float(input("Enter second number: "))
+                print("Select operation:")
+                print("a. Add")
+                print("b. Subtract")
+                print("c. Multiply")
+                print("d. Divide")
+                op = input("Operation: ")
+
+                if op == "a":
+                    print("Result:", calc.add(a, b))
+                elif op == "b":
+                    print("Result:", calc.subtract(a, b))
+                elif op == "c":
+                    print("Result:", calc.multiply(a, b))
+                elif op == "d":
+                    try:
+                        print("Result:", calc.divide(a, b))
+                    except ValueError as e:
+                        print(f"Error: {e}")
+                else:
+                    print("Invalid operation.")
+            except ValueError:
+                print("Please enter valid numbers.")
+
+        elif choice == "2":
+            try:
+                monthly = float(input("Enter monthly expense: "))
+                months = int(input("Enter number of months: "))
+                total = calc.calculate_expense(monthly, months)
+                print(f"Total expense for {months} months is: {total}")
+            except ValueError:
+                print("Invalid input.")
+
+        elif choice == "3":
+            try:
+                future_month = int(input("Enter future month number for prediction: "))
+                prediction = calc.predict_expense(future_month)
+                print(f"Predicted expense for month {future_month}: {prediction:.2f}")
+            except ValueError:
+                print("Enter a valid integer.")
+        
+        elif choice == "4":
+            print("Exiting... Goodbye!")
+            break
+        
+        else:
+            print("Invalid choice. Try again.")
+
+if __name__ == "__main__":
+    main()
