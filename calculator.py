@@ -30,6 +30,26 @@ class SmartCalculator:
     def calculate_expense(self, monthly, months):
         return monthly * months
 
+    def compound_interest(self, principal, rate, time, n=12):
+        """
+        Calculates compound interest.
+        A = P(1 + r/n)^(nt)
+        """
+        amount = principal * (1 + (rate / 100) / n) ** (n * time)
+        return amount
+
+    def loan_emi(self, principal, rate, time_years):
+        """
+        Calculates monthly EMI for a loan.
+        EMI = [P x r x (1+r)^n]/[(1+r)^n-1]
+        """
+        r = (rate / 100) / 12
+        n = time_years * 12
+        if r == 0:
+            return principal / n
+        emi = (principal * r * (1 + r) ** n) / ((1 + r) ** n - 1)
+        return emi
+
     def predict_expense(self, future_month):
         return self.expense_predictor.predict(future_month)
 

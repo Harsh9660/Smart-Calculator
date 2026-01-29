@@ -2,112 +2,185 @@ import streamlit as st
 import sys
 import os
 import pandas as pd
-import matplotlib.pyplot as plt
-# Add the project root to the Python path to allow importing 'calculator'
+import plotly.graph_objects as go
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from calculator import SmartCalculator
 
-
 @st.cache_resource
 def load_calculator():
-    """Loads the SmartCalculator and trains the model. Cached to prevent reloading on each run."""
+    """Loads the SmartCalculator and trains the model. Cached to prevent reloading."""
     try:
-        calc = SmartCalculator()
-        return calc
-    except FileNotFoundError:
-        return None
-
-@st.cache_data
-def load_data():
-    """Loads the historical expense data from data.csv. Cached for performance."""
-    data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data.csv'))
-    try:
-        return pd.read_csv(data_path)
-    except FileNotFoundError:
+        return SmartCalculator()
+    except Exception:
         return None
 
 def main():
-    st.set_page_config(page_title="Smart Calculator", page_icon="💡", layout="wide")
+    st.set_page_config(page_title="Smart Calc AI", page_icon="📈", layout="wide")
 
-    st.title("💡 Smart Financial Calculator")
-    st.write("An intelligent tool for your arithmetic needs and financial expense forecasting.")
+    # Custom CSS for Premium Look
+    st.markdown("""
+        <style>
+        .main {
+            background-color: #f8f9fa;
+        }
+        .stButton>button {
+            width: 100%;
+            border-radius: 8px;
+            height: 3em;
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .stButton>button:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .stMetric {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        div[data-testid="stExpander"] {
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    st.title("🚀 Smart Calc AI & Expense Forecast")
+    st.markdown("---")
 
     calc = load_calculator()
-    expense_data = load_data()
-
-    if calc is None or expense_data is None:
-        st.error("Error: `data.csv` not found. Please ensure it exists in the project root directory.")
+    
+    # Path for data
+    data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data.csv'))
+    
+    try:
+        expense_data = pd.read_csv(data_path)
+    except FileNotFoundError:
+        st.error("Error: `data.csv` not found.")
         st.stop()
 
-    # --- Sidebar for Inputs ---
-    st.sidebar.header("Controls")
+    tab1, tab2, tab3 = st.tabs(["🧮 Calculator Suite", "📈 Expense Forecast", "📊 Data Management"])
 
-    # Calculator Section in Sidebar
-    with st.sidebar.expander("🧮 Basic Calculator", expanded=False):
-        num1 = st.number_input("First number:", value=0.0, format="%.4f", key="num1")
-        num2 = st.number_input("Second number:", value=1.0, format="%.4f", key="num2")
-        operation = st.selectbox(
-            "Operation:",
-            ["Addition", "Subtraction", "Multiplication", "Division", "Modulo", "Power"],
-            key="op"
-        )
-        if st.button("Calculate", key="calc_btn"):
-            result = None
-            try:
-                if operation == "Addition": result = calc.add(num1, num2)
-                elif operation == "Subtraction": result = calc.subtract(num1, num2)
-                elif operation == "Multiplication": result = calc.multiply(num1, num2)
-                elif operation == "Division": result = calc.divide(num1, num2)
-                elif operation == "Modulo": result = calc.modulo(num1, num2)
-                elif operation == "Power": result = calc.power(num1, num2)
+    with tab1:
+        st.header("Financial Calculator Suite")
+        calc_type = st.selectbox("Choose a tool:", ["Basic Arithmetic", "Compound Interest", "Loan EMI"])
+        
+        col_in, col_out = st.columns([1, 1])
+        
+        with col_in:
+            if calc_type == "Basic Arithmetic":
+                n1 = st.number_input("Number 1", value=0.0, step=1.0)
+                n2 = st.number_input("Number 2", value=0.0, step=1.0)
+                op = st.selectbox("Operation", ["+", "-", "*", "/", "%", "^"])
+                if st.button("Calculate Result"):
+                    try:
+                        if op == "+": res = calc.add(n1, n2)
+                        elif op == "-": res = calc.subtract(n1, n2)
+                        elif op == "*": res = calc.multiply(n1, n2)
+                        elif op == "/": res = calc.divide(n1, n2)
+                        elif op == "%": res = calc.modulo(n1, n2)
+                        else: res = calc.power(n1, n2)
+                        st.session_state.res = res
+                    except Exception as e:
+                        st.error(f"Error: {e}")
+            
+            elif calc_type == "Compound Interest":
+                p = st.number_input("Principal (P)", value=1000.0, step=100.0)
+                r = st.number_input("Annual Interest Rate (%)", value=5.0, step=0.1)
+                t = st.number_input("Time Period (Years)", value=5.0, step=1.0)
+                if st.button("Calculate Final Amount"):
+                    st.session_state.res = calc.compound_interest(p, r, t)
+
+            elif calc_type == "Loan EMI":
+                p = st.number_input("Loan Amount", value=50000.0, step=1000.0)
+                r = st.number_input("Annual Interest Rate (%)", value=8.5, step=0.1)
+                t = st.number_input("Loan Tenure (Years)", value=3.0, step=0.5)
+                if st.button("Calculate Monthly EMI"):
+                    st.session_state.res = calc.loan_emi(p, r, t)
+
+        with col_out:
+            if 'res' in st.session_state:
+                st.subheader("Calculation Result")
+                st.metric("Total/Result", f"{st.session_state.res:,.2f}")
+                del st.session_state.res
+
+    with tab2:
+        st.header("Expense Forecasting")
+        
+        future_m = st.slider("Select Month for Prediction:", 
+                           min_value=1, 
+                           max_value=48, 
+                           value=int(expense_data['month'].max()) + 1)
+        
+        prediction = calc.predict_expense(future_m)
+        
+        # Plotly Visualization
+        max_m = max(future_m, int(expense_data['month'].max()))
+        x_trend = list(range(1, max_m + 2))
+        y_trend = [calc.predict_expense(m) for m in x_trend]
+        
+        fig = go.Figure()
+        
+        # Historical Data
+        fig.add_trace(go.Scatter(x=expense_data['month'], y=expense_data['expense'], 
+                                mode='lines+markers', name='Historical',
+                                line=dict(color='#007bff', width=3)))
+        
+        # Trend Line
+        fig.add_trace(go.Scatter(x=x_trend, y=y_trend, 
+                                mode='lines', name='Forecast Trend',
+                                line=dict(color='#ff7f0e', dash='dash')))
+        
+        # Prediction Point
+        fig.add_trace(go.Scatter(x=[future_m], y=[prediction], 
+                                mode='markers', name='Prediction Point',
+                                marker=dict(color='red', size=15, symbol='star')))
+        
+        fig.update_layout(title="Expense Trend Analysis",
+                          xaxis_title="Month",
+                          yaxis_title="Expense Amount",
+                          template="plotly_white",
+                          hovermode="x unified")
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+        st.success(f"Estimated expense for month **{future_m}** is **${prediction:,.2f}**.")
+
+    with tab3:
+        st.header("Data Management")
+        
+        col_v, col_a = st.columns([1, 1])
+        
+        with col_v:
+            st.subheader("Historical Records")
+            st.dataframe(expense_data, use_container_width=True)
+        
+        with col_a:
+            st.subheader("Add or Update Record")
+            new_m = st.number_input("Month Index", value=int(expense_data['month'].max()) + 1, step=1)
+            new_e = st.number_input("Expense Value", value=1000.0, step=100.0)
+            
+            if st.button("Save Record"):
+                if new_m in expense_data['month'].values:
+                    expense_data.loc[expense_data['month'] == new_m, 'expense'] = new_e
+                    st.info(f"Updated record for month {new_m}")
+                else:
+                    new_row = pd.DataFrame({'month': [new_m], 'expense': [new_e]})
+                    expense_data = pd.concat([expense_data, new_row], ignore_index=True)
+                    st.success(f"Added new record for month {new_m}")
                 
-                if result is not None:
-                    st.session_state.calc_result = f"The result of {operation} is **{result:.4f}**"
-            except ValueError as e:
-                st.session_state.calc_result = f"Error: {e}"
-
-    # Prediction Section in Sidebar
-    st.sidebar.header("📈 Expense Prediction")
-    future_month = st.sidebar.slider(
-        "Select a future month to predict:", 
-        min_value=1, 
-        max_value=36, 
-        value=max(13, int(expense_data['month'].max()) + 1), 
-        step=1
-    )
-
-    # --- Main Panel for Outputs ---
-    if 'calc_result' in st.session_state:
-        st.info(st.session_state.calc_result)
-        del st.session_state.calc_result
-
-    st.header("Expense Analysis and Forecasting")
-    
-    prediction = calc.predict_expense(future_month)
-
-    col1, col2 = st.columns([2, 1])
-
-    with col1:
-        st.subheader("Expense Trend & Prediction")
-        max_month = max(future_month, int(expense_data['month'].max()))
-        x_range = list(range(1, max_month + 2))
-        y_pred_line = [calc.predict_expense(m) for m in x_range]
-
-        fig, ax = plt.subplots()
-        ax.plot(expense_data['month'], expense_data['expense'], marker='o', linestyle='-', color='b', label='Historical Expenses')
-        ax.plot(x_range, y_pred_line, linestyle='--', color='r', label='Expense Trend')
-        ax.plot(future_month, prediction, marker='*', markersize=15, color='gold', label=f'Prediction for Month {future_month}')
-        ax.set_title("Historical vs. Predicted Expenses")
-        ax.set_xlabel("Month")
-        ax.set_ylabel("Expense ($)")
-        ax.grid(True, which='both', linestyle='--', linewidth=0.5)
-        ax.legend()
-        st.pyplot(fig)
-
-    with col2:
-        st.subheader("Prediction Result")
-        st.metric(label=f"Predicted Expense for Month {future_month}", value=f"${prediction:,.2f}")
-        st.info(f"Based on the historical data, the model predicts the expense for month {future_month} will be approximately **${prediction:,.2f}**.")
+                expense_data = expense_data.sort_values('month')
+                expense_data.to_csv(data_path, index=False)
+                
+                # Retrain model
+                calc.expense_predictor.train_model()
+                st.rerun()
 
 if __name__ == "__main__":
     main()

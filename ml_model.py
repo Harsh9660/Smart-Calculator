@@ -8,19 +8,37 @@ _DATA_PATH = os.path.join(_CURRENT_DIR, "data.csv")
 class ExpensePredictor:
     def __init__(self):
         self.model = LinearRegression()
+        self.is_trained = False
 
     def train_model(self):
+        """Trains the model using historical data from data.csv."""
         try:
+            if not os.path.exists(_DATA_PATH):
+                df = pd.DataFrame({'month': [1], 'expense': [1000]})
+                df.to_csv(_DATA_PATH, index=False)
+            
             data = pd.read_csv(_DATA_PATH)
-        except FileNotFoundError:
-            raise FileNotFoundError(
-                f"Error: The data file 'data.csv' was not found. It should be in the project root: {_CURRENT_DIR}"
-            )
-        X = data[['month']]       
-        y = data['expense']       
+            
+            if data.empty or len(data) < 2:
+                self.is_trained = False
+                return
 
-        self.model.fit(X, y)
+            X = data[['month']]       
+            y = data['expense']       
+
+            self.model.fit(X, y)
+            self.is_trained = True
+        except Exception as e:
+            print(f"Error training model: {e}")
+            self.is_trained = False
 
     def predict(self, month):
+        """Predicts expense for a given month index."""
+        if not self.is_trained:
+            self.train_model()
+            
+        if not self.is_trained:
+            return 0.0
+            
         prediction = self.model.predict([[month]])
-        return prediction[0]
+        return max(0, prediction[0])
