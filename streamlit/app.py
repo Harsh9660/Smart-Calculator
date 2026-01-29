@@ -1,29 +1,41 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
-import sklearn
-from ..calculator import add, sub, mul, div, mod, pow
+from calculator import add, sub, mul, div, mod, pow
 
 def main():
     st.title("Smart Calculator")
-    st.write("This is a smart calculator that can perform addition, subtraction, multiplication, division, and modulo operations.")
-    st.write("Enter the first number:")
-    num1 = st.number_input("Number 1", value=0)
-    st.write("Enter the second number:")
-    num2 = st.number_input("Number 2", value=0)
-    st.write("Select the operation:")
-    operation = st.selectbox("Operation", ["Addition", "Subtraction", "Multiplication", "Division", "Modulo"])
-    if st.button("Calculate"):
-        if operation == "Addition":
-            st.write("The result is:", num1 + num2)
-        elif operation == "Subtraction":
-            st.write("The result is:", num1 - num2)
-        elif operation == "Multiplication":
-            st.write("The result is:", num1 * num2)
-        elif operation == "Division":
-            st.write("The result is:", num1 / num2)
-        elif operation == "Modulo":
-            st.write("The result is:", num1 % num2)
+    st.write("This is a simple calculator that can perform basic arithmetic operations.")
 
-    else:
-        st.write("Please select an operation.")
+    num1 = st.number_input("Enter the first number:", value=0.0, format="%.4f")
+    num2 = st.number_input("Enter the second number:", value=0.0, format="%.4f")
+
+    operation = st.selectbox(
+        "Select an operation:",
+        ["Addition", "Subtraction", "Multiplication", "Division", "Modulo", "Power"]
+    )
+
+    if st.button("Calculate"):
+        result = None
+        if operation == "Addition":
+            result = add(num1, num2)
+        elif operation == "Subtraction":
+            result = sub(num1, num2)
+        elif operation == "Multiplication":
+            result = mul(num1, num2)
+        elif operation == "Division":
+            if num2 == 0:
+                st.error("Error: Division by zero is not allowed.")
+            else:
+                result = div(num1, num2)
+        elif operation == "Modulo":
+            if num2 == 0:
+                st.error("Error: Modulo by zero is not allowed.")
+            else:
+                result = mod(num1, num2)
+        elif operation == "Power":
+            result = pow(num1, num2)
+
+        if result is not None:
+            st.success(f"Result: {result}")
+
+if __name__ == "__main__":
+    main()

@@ -1,2 +1,17 @@
 # Smart-Calculator
-Smart Calculator with Machine Learning is a Python-based project that performs arithmetic and financial calculations while using Linear Regression to predict future expenses and savings. It combines core Python, OOP, data handling, and basic ML concepts to demonstrate real-world predictive analysis.
+
+A simple, web-based calculator built with Python and Streamlit. This application provides a user-friendly interface to perform basic arithmetic operations.
+
+## Features
+
+*   Addition
+*   Subtraction
+*   Multiplication
+*   Division
+*   Modulo
+*   Power
+
+## How to Run
+
+1.  Install the required dependencies: `pip install streamlit`
+2.  From the project's root directory, run the command: `streamlit run streamlit/app.py`
